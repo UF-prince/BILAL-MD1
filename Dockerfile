@@ -1,15 +1,21 @@
-FROM node:lts-buster
-USER root
-RUN apt-get update && \
-    apt-get install -y ffmpeg webp git && \
-    apt-get upgrade -y && \
-    rm -rf /var/lib/apt/lists/*
-USER node
-RUN git clone https://github.com/JawadTechX/DJ /home/node/DJ
-WORKDIR /home/node/DJ
-RUN chmod -R 777 /home/node/DJ/
-RUN yarn install --network-concurrency 1
-EXPOSE 7860
-ENV NODE_ENV=production
-CMD ["npm", "start"]
+FROM node:18
 
+WORKDIR /app
+
+# SSH Key Setup
+RUN mkdir -p /root/.ssh
+COPY id_rsa /root/.ssh/id_rsa
+RUN chmod 600 /root/.ssh/id_rsa
+RUN ssh-keyscan github.com >> /root/.ssh/known_hosts
+
+# Clone Private Repo
+RUN git clone git@github.com:BilalTech05/BILAL-MD.git .
+
+# Install Dependencies
+RUN npm install
+
+# Expose Port (Heroku dynamic port)
+EXPOSE $PORT
+
+# Start Command
+CMD ["node", "index.js"]
