@@ -1,1 +1,33 @@
 
+name: Deploy Bilal-MD to Heroku
+
+on:
+  push:
+    branches:
+      - main  # ya jis branch par aap push karte ho
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout this repo
+        uses: actions/checkout@v3
+
+      - name: Checkout BilalTech05/BILAL-MD
+        uses: actions/checkout@v3
+        with:
+          repository: BilalTech05/BILAL-MD
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: bilal-md
+
+      - name: Push to Heroku
+        working-directory: bilal-md
+        run: |
+          git remote add heroku https://git.heroku.com/${{ secrets.HEROKU_APP_NAME }}.git
+          git push heroku main --force
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+          HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
+          HEROKU_EMAIL: ${{ secrets.HEROKU_EMAIL }}
+          
